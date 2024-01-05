@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Stock Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      border-radius: 5px;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid #ccc;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #333;
+      color: white;
+    }
+
+    .buy {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .exit {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .negative {
+      color: #f44336;
+    }
+
+    @media (max-width: 600px) {
+      table {
+        font-size: 80%;
+      }
+    }
+
+    .video-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .additional-details {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .additional-details h2 {
+      color: #333;
+    }
+
+    a {
+      color: #007BFF;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>SRT PORTFOLIO</h1>
+  <table>
+    <tr>
+      <th>Stock</th>
+      <th>Date</th>
+      <th>Action</th>
+      <th>Price</th>
+      <th>Qty</th>
+      <th>P&L</th>
+    </tr>
+  </table>
+
+  <!-- Add YouTube video frame -->
+  <div class="video-container">
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/01x9miS2cQ0" frameborder="0"
+      allowfullscreen></iframe>
+  </div>
+
+  <!-- Additional details -->
+  <div class="additional-details">
+    <h2>Name: SRT PORTFOLIO</h2>
+    <h2>STRTGY video link: <a href="https://youtu.be/01x9miS2cQ0">https://youtu.be/01x9miS2cQ0</a></h2>
+    <h2>Copyright: Satyendra Sarat</h2>
+    <h2>Contact Information: 7011847629</h2>
+    <h2>Telegram Group: <a href="https://t.me/+GSDz3m4yEpIxYmU1">https://t.me/+GSDz3m4yEpIxYmU1</a></h2>
+  </div>
+
+  <script>
+    // Function to fetch and convert CSV to JSON
+    function fetchCSVAndConvertToJSON() {
+      var csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTbrr6bBsFvD7uaEH6sQ1gnEwfD0ukBtaDwhirdPFF8ux1b2CA79BPLXjNZNoH0VagT6kq05tO9qNus/pub?gid=374636284&single=true&output=csv";
+
+      fetch(csvURL)
+        .then(response => response.text())
+        .then(csvData => {
+          var jsonData = csvJSON(csvData);
+          displayJSONInTable(jsonData);
+        })
+        .catch(error => console.error(error));
+    }
+
+    // Function to convert CSV to JSON
+    function csvJSON(csv) {
+      var lines = csv.split("\n");
+      var result = [];
+      var headers = lines[0].split(",");
+
+      for (var i = 1; i < lines.length; i++) {
+        var currentline = lines[i].split(",");
+        if (currentline.length >= 6 && currentline[0]) { // Check for at least 6 columns and a non-empty first column
+          var obj = {};
+          obj.Stock = currentline[0];
+          obj.Date = currentline[1];
+          obj.Action = currentline[2];
+          obj.Price = parseFloat(currentline[3]).toFixed(2); // Limit to 2 decimal places
+          obj.Qty = currentline[4];
+          var pnlValue = parseFloat(currentline[5]).toFixed(2); // Limit to 2 decimal places
+          obj["P&L"] = pnlValue;
+          // Replace "NaN" with blank
+          if (obj.Price === "NaN") {
+            obj.Price = "";
+          }
+          if (pnlValue === "NaN") {
+            obj["P&L"] = "";
+          }
+          result.push(obj);
+        }
+      }
+
+      return JSON.stringify(result);
+    }
+
+    // Function to display JSON data in the table
+    function displayJSONInTable(jsonData) {
+      jsonData = JSON.parse(jsonData);
+
+      var table = document.querySelector("table");
+      // Clear the existing table except the header row
+      var rows = table.rows;
+      for (var i = rows.length - 1; i > 0; i--) {
+        table.deleteRow(i);
+      }
+
+      jsonData.forEach(function (entry) {
+        var row = table.insertRow(-1);
+        for (var key in entry) {
+          var cell = row.insertCell();
+          if (key === "Action") {
+            cell.className = entry[key].toLowerCase();
+            cell.innerHTML = entry[key];
+          } else if (key === "P&L") {
+            // Set font color based on P&L value
+            cell.innerHTML = entry[key];
+            if (parseFloat(entry[key]) < 0) {
+              cell.className = "negative";
+            }
+          } else {
+            cell.innerHTML = entry[key];
+          }
+        }
+      });
+    }
+
+    // Call the function to fetch and display data
+    fetchCSVAndConvertToJSON();
+  </script>
+</body>
+
+</html>
